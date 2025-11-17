@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.20)
+project(packet-analyzer)
+
+add_executable(main
+    src/main.cpp)
+
+target_compile_features(main PRIVATE cxx_std_17)
+target_compile_options(main PRIVATE -Wall -Wextra -Wconversion -Wsign-conversion -Wfloat-conversion -pedantic-errors)
