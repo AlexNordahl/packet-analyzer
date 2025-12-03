@@ -21,7 +21,15 @@ int main()
         printEthernetFrame(frame);
         if (frame.type == ETHERTYPE_IP)
         {
-            printIPV4(pf.parseIPV4(payload));
+            const auto [header, data] = pf.parseIPV4(payload);
+            printIPV4(header);
+
+            if (header.protocol == 6)
+            {
+                const auto tcp = pf.parseTCP(data);
+                std::cout << tcp.srcPort << "\n";
+                std::cout << tcp.dstPort << "\n";
+            }
         }
         std::cout << "\n";
     }
