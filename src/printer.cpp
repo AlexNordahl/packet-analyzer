@@ -60,24 +60,54 @@ void printIPV4(const IpHeader& header)
 
     std::cout << "│ "
               << left << setw(20) << header.getTTL()
-              << left << setw(10) << protocol::toKeyword(header.getProtocol())
+              << left << setw(10) << toKeyword(header.getProtocol())
               << left << setw(19) << header.getChecksum()
               << " │\n";
 
     std::cout << "│ "
-              << left << setw(49) << "SOURCE ADDRESS"
+              << left << setw(24) << "SOURCE ADDRESS"
+              << left << setw(25) << "DESTINATION ADDRESS"
               << " │\n";
 
     std::cout << "│ "
-              << left << setw(49) << header.srcStr()
+              << left << setw(24) << header.srcStr()
+              << left << setw(25) << header.dstStr()
+              << " │\n";
+
+    std::cout << "├───────────────────────────────────────────────────┤\n";
+    
+}
+
+void printTCP(const TcpHeader& header)
+{
+    std::cout << "│ "
+              << left << setw(24) << "SOURCE PORT"
+              << left << setw(25) << "DESTINATION PORT"
               << " │\n";
 
     std::cout << "│ "
-              << left << setw(49) << "DESTINATION ADDRESS"
+              << left << setw(24) << header.sourcePort()
+              << left << setw(25) << header.destPort()
               << " │\n";
 
     std::cout << "│ "
-              << left << setw(49) << header.dstStr()
+              << left << setw(24) << "SEQUENCE NUMBER"
+              << left << setw(25) << "ACK NUMBER"
+              << " │\n";
+
+    std::cout << "│ "
+              << left << setw(24) << header.seq()
+              << left << setw(25) << header.ack()
+              << " │\n";
+
+    std::cout << "│ "
+              << left << setw(24) << "HDR LEN (bytes)"
+              << left << setw(25) << "FLAGS"
+              << " │\n";
+
+    std::cout << "│ "
+              << left << setw(24) << header.headerLengthBytes()
+              << left << setw(25) << tcpFlags(header.flags)
               << " │\n";
 
     std::cout << "└───────────────────────────────────────────────────┘\n";
