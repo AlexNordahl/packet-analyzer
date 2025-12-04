@@ -65,13 +65,13 @@ void printIPV4(const IpHeader& header)
               << " │\n";
 
     std::cout << "│ "
-              << left << setw(24) << "SOURCE ADDRESS"
-              << left << setw(25) << "DESTINATION ADDRESS"
+              << left << setw(20) << "SOURCE ADDRESS"
+              << left << setw(29) << "DESTINATION ADDRESS"
               << " │\n";
 
     std::cout << "│ "
-              << left << setw(24) << header.srcStr()
-              << left << setw(25) << header.dstStr()
+              << left << setw(20) << header.srcStr()
+              << left << setw(29) << header.dstStr()
               << " │\n";
 
     std::cout << "├───────────────────────────────────────────────────┤\n";
@@ -108,6 +108,31 @@ void printTCP(const TcpHeader& header)
     std::cout << "│ "
               << left << setw(24) << header.headerLengthBytes()
               << left << setw(25) << tcpFlags(header.flags)
+              << " │\n";
+
+    std::cout << "└───────────────────────────────────────────────────┘\n";
+}
+
+void printUDP(const UdpHeader& header)
+{
+    std::cout << "│ "
+              << left << setw(24) << "SOURCE PORT"
+              << left << setw(25) << "DESTINATION PORT"
+              << " │\n";
+
+    std::cout << "│ "
+              << left << setw(24) << header.sourcePort()
+              << left << setw(25) << header.destPort()
+              << " │\n";
+
+    std::cout << "│ "
+              << left << setw(24) << "LENGTH"
+              << left << setw(25) << "CHECKSUM"
+              << " │\n";
+
+    std::cout << "│ "
+              << left << setw(24) << header.length()
+              << left << setw(25) << header.checksum()
               << " │\n";
 
     std::cout << "└───────────────────────────────────────────────────┘\n";

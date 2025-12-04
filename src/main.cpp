@@ -24,10 +24,23 @@ int main()
             const auto [header, data] = pf.parseIPV4(payload);
             printIPV4(header);
 
-            if (header.protocol == 6)
+            switch (header.protocol)
             {
-                const auto segment = pf.parseTCP(data);
-                printTCP(segment);
+                case IPPROTO_TCP:
+                {
+                    const auto segment = pf.parseTCP(data);
+                    printTCP(segment);
+                    break;
+                }
+
+                case IPPROTO_UDP:
+                {
+                    const auto segment = pf.parseUDP(data);
+                    printUDP(segment);
+                    break;
+                }
+
+                default: break;
             }
         }
         std::cout << "\n";

@@ -157,6 +157,14 @@ TcpHeader PcapFacade::parseTCP(const u_char* data)
     return tcp;
 }
 
+UdpHeader PcapFacade::parseUDP(const u_char *data)
+{
+    UdpHeader udp {};
+    std::memcpy(&udp, data, sizeof(udp));
+
+    return udp;
+}
+
 ArpHeader PcapFacade::parseARP(const u_char* payload)
 {
     ArpHeader arp{};
