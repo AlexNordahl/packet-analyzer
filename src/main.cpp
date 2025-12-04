@@ -26,9 +26,8 @@ int main()
 
             if (header.protocol == 6)
             {
-                const auto tcp = pf.parseTCP(data);
-                std::cout << tcp.srcPort << "\n";
-                std::cout << tcp.dstPort << "\n";
+                const auto segment = pf.parseTCP(data);
+                printTCP(segment);
             }
         }
         std::cout << "\n";
