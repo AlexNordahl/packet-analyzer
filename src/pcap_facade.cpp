@@ -165,6 +165,14 @@ UdpHeader PcapFacade::parseUDP(const u_char *data)
     return udp;
 }
 
+IcmpHeader PcapFacade::parseICMP(const u_char *data)
+{
+    IcmpHeader icmp {};
+    std::memcpy(&icmp, data, sizeof(icmp));
+
+    return icmp;
+}
+
 ArpHeader PcapFacade::parseARP(const u_char* payload)
 {
     ArpHeader arp{};

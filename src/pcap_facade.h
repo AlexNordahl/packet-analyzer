@@ -6,6 +6,7 @@
 #include "net_headers/arp_header.h"
 #include "net_headers/tcp_header.h"
 #include "net_headers/udp_header.h"
+#include "net_headers/icmp_header.h"
 #include <vector>
 #include <array>
 #include <string>
@@ -41,6 +42,7 @@ public:
     std::pair<IpHeader, const u_char*> parseIPV4(const u_char* payload);
     TcpHeader parseTCP(const u_char* data);
     UdpHeader parseUDP(const u_char* data);
+    IcmpHeader parseICMP(const u_char* data);
     ArpHeader parseARP(const u_char* payload);
 
 private:
