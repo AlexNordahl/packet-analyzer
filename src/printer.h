@@ -7,6 +7,8 @@
 #include "net_headers/tcp_header.h"
 #include "net_headers/udp_header.h"
 #include "net_headers/icmp_header.h"
+#include "net_headers/dns_header.h"
+#include "helpers/readable_protocols.h"
 #include <iomanip>
 #include <iostream>
 
@@ -15,5 +17,6 @@ void printIPV4(const IpHeader& header);
 void printTCP(const TcpHeader& header);
 void printUDP(const UdpHeader& header);
 void printICMP(const IcmpHeader& header);
+void printDNS(const DnsHeader& header);
 
 #endif

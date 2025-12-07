@@ -1,5 +1,4 @@
 #include "printer.h"
-#include "helpers/protocol_keyword.h"
 
 using std::setw;
 using std::left;
@@ -60,7 +59,7 @@ void printIPV4(const IpHeader& header)
 
     std::cout << "│ "
               << left << setw(20) << header.getTTL()
-              << left << setw(10) << toKeyword(header.getProtocol())
+              << left << setw(10) << protocolKeyword(header.getProtocol())
               << left << setw(19) << header.getChecksum()
               << " │\n";
 
@@ -107,7 +106,7 @@ void printTCP(const TcpHeader& header)
 
     std::cout << "│ "
               << left << setw(24) << header.headerLengthBytes()
-              << left << setw(25) << tcpFlags(header.flags)
+              << left << setw(25) << tcpFlags(header.flags, "|")
               << " │\n";
 
     std::cout << "└───────────────────────────────────────────────────┘\n";
@@ -135,7 +134,7 @@ void printUDP(const UdpHeader& header)
               << left << setw(25) << header.checksum()
               << " │\n";
 
-    std::cout << "└───────────────────────────────────────────────────┘\n";
+    std::cout << "├───────────────────────────────────────────────────┤\n";
 }
 
 void printICMP(const IcmpHeader& header)
@@ -160,6 +159,76 @@ void printICMP(const IcmpHeader& header)
     std::cout << "│ "
               << left << setw(20) << header.getIdentifier()
               << left << setw(29) << header.getSequence()
+              << " │\n";
+
+    std::cout << "└───────────────────────────────────────────────────┘\n";
+}
+
+void printDNS(const DnsHeader& header)
+{
+    std::cout << "│ " << left << setw(49) << "DNS" << " │\n";
+    
+    std::cout << "│ "
+              << left << setw(24) << "ID"
+              << left << setw(25) << "FLAGS"
+              << " │\n";
+
+    std::cout << "│ "
+            << std::left << std::setw(24) << header.getId();
+
+    const auto flags = dnsFlags(header.getFlags());
+
+    std::size_t counter = 0;
+    std::string buffer;
+    bool firstLine = true;
+
+    for (std::size_t i = 0; i < flags.size(); ++i)
+    {
+        if (!buffer.empty())
+            buffer += '|';
+
+        buffer += flags[i];
+        ++counter;
+
+        const bool lastItem = (i == flags.size() - 1);
+
+        if (counter == 3 or lastItem)
+        {
+            if (firstLine)
+            {
+                std::cout << std::left << std::setw(25) << buffer << " │\n";
+                firstLine = false;
+            }
+            else
+            {
+                std::cout << "│ "
+                        << std::left << std::setw(24) << ""
+                        << std::left << std::setw(25) << buffer << " │\n";
+            }
+
+            buffer.clear();
+            counter = 0;
+        }
+    }
+
+    std::cout << "│ "
+              << left << setw(24) << "QUESTION COUNT"
+              << left << setw(25) << "ANSWER COUNT"
+              << " │\n";
+
+    std::cout << "│ "
+              << left << setw(24) << header.getQuestionCount()
+              << left << setw(25) << header.getAnswerCount()
+              << " │\n";
+
+    std::cout << "│ "
+              << left << setw(24) << "AUTH COUNT"
+              << left << setw(25) << "ADDITIONAL COUNT"
+              << " │\n";
+
+    std::cout << "│ "
+              << left << setw(24) << header.getAuthCount()
+              << left << setw(25) << header.getAdditionalCount()
               << " │\n";
 
     std::cout << "└───────────────────────────────────────────────────┘\n";
