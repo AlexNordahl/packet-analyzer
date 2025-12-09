@@ -4,7 +4,7 @@ project(packet-analyzer)
 add_executable(main
     src/main.cpp
     src/pcap_facade.cpp
-    src/printer.cpp
+    src/printer/printer.cpp
     src/helpers/readable_protocols.cpp)
 
 target_link_libraries(main pcap)
