@@ -10,6 +10,7 @@ PcapFacade::~PcapFacade()
     pcap_freealldevs(allDevs);
     if (handle != nullptr)
         pcap_close(handle);
+    pcap_freecode(&fp);
 }
 
 void PcapFacade::selectDevice(const std::string_view devName)
@@ -112,6 +113,20 @@ int PcapFacade::maskToCIDR(const std::string& mask) const
     return count;
 }
 
+void PcapFacade::setFilter(std::string text, const bool optimize)
+{
+    if (pcap_compile(handle, &fp, text.c_str(), optimize, maskp) < 0) 
+    {
+        throw std::runtime_error("setFilter(): pcap_compile error");
+    }
+
+    if (pcap_setfilter(handle, &fp) < 0) 
+    {
+        pcap_freecode(&fp);
+        throw std::runtime_error("setFilter(): pcap_setFilter error");
+    }
+}
+
 std::pair<EtherFrame, const u_char*> PcapFacade::next()
 {
     pcap_pkthdr *hdr;
@@ -136,69 +151,9 @@ std::pair<EtherFrame, const u_char*> PcapFacade::next()
     return {frame, payload};
 }
 
-std::pair<IpHeader, const u_char*> PcapFacade::parseIPV4(const u_char* payload)
-{
-    IpHeader ip{};
-    std::memcpy(&ip, payload, 20);
-
-    uint8_t ihl = ip.ver_ihl & 0x0F;
-    size_t headerLength = ihl * 4;
-
-    const u_char* data = payload + headerLength;
-
-    return {ip, data};
-}
-
-std::pair<TcpHeader, const u_char*> PcapFacade::parseTCP(const u_char* data)
-{
-    TcpHeader tcp {};
-    std::memcpy(&tcp, data, sizeof(TcpHeader));
-
-    data = data + tcp.headerLengthBytes();
-
-    return {tcp, data};
-}
-
-PcapFacade::ParsedUDP PcapFacade::parseUDP(const u_char *data)
-{
-    UdpHeader udp {};
-    std::memcpy(&udp, data, sizeof(UdpHeader));
-
-    data = data + sizeof(udp);
-    int length = udp.length() - static_cast<int>(sizeof(udp));
-
-    return {udp, data, length};
-}
-
-IcmpHeader PcapFacade::parseICMP(const u_char *data)
-{
-    IcmpHeader icmp {};
-    std::memcpy(&icmp, data, sizeof(IcmpHeader));
-
-    return icmp;
-}
-
-ArpHeader PcapFacade::parseARP(const u_char* payload)
-{
-    ArpHeader arp{};
-    memcpy(&arp, payload, sizeof(ArpHeader));
-
-    return arp;
-}
-
-DnsHeader PcapFacade::parseDNS(const u_char *data)
-{
-    DnsHeader dns {};
-    std::memcpy(&dns, data, sizeof(DnsHeader));
-
-    return dns;
-}
-
 void PcapFacade::extractIPv4Data()
 {
     struct in_addr addr;
-    bpf_u_int32 netp;
-    bpf_u_int32 maskp;
     pcap_lookupnet(selectedDevName.c_str(), &netp, &maskp, errbuf);
 
     addr.s_addr = netp;
