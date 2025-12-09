@@ -1,10 +1,10 @@
-#include "printer.h"
-#include "ansi_colors.h"
+#include "console_printer.h"
+#include "../helpers/ansi_colors.h"
 
 using std::setw;
 using std::left;
 
-void printEthernetFrame(const EtherFrame &frame)
+void ConsolePrinter::printEthernet(const EtherFrame &frame) const
 {
     const auto protocolColor = ansi::bright_magenta;
     const auto fieldsColor = ansi::bright_blue;
@@ -38,7 +38,7 @@ void printEthernetFrame(const EtherFrame &frame)
     std::cout << "├───────────────────────────────────────────────────┤\n";
 }
 
-void printARP(const ArpHeader &header)
+void ConsolePrinter::printARP(const ArpHeader &header) const
 {
     const auto protocolColor = ansi::purple;
     const auto fieldsColor = ansi::bright_blue;
@@ -63,7 +63,7 @@ void printARP(const ArpHeader &header)
     std::cout << "│ ";
     std::cout << valuesColor
               << left << setw(9) << header.hardwareType()
-              << std::showbase << std::hex << left << setw(9) << header.protocolType() << std::noshowbase
+              << std::showbase << std::hex << left << setw(9) << header.protocolType() << std::noshowbase << std::dec
               << left << setw(9) << header.hardwareLength()
               << left << setw(9) << header.protocolLength()
               << left << setw(13) << arpOper
@@ -102,7 +102,7 @@ void printARP(const ArpHeader &header)
     
 }
 
-void printIPV4(const IpHeader& header)
+void ConsolePrinter::printIPV4(const IpHeader& header) const
 {
     const auto protocolColor = ansi::blue;
     const auto fieldsColor = ansi::bright_blue;
@@ -181,7 +181,7 @@ void printIPV4(const IpHeader& header)
     
 }
 
-void printTCP(const TcpHeader& header)
+void ConsolePrinter::printTCP(const TcpHeader& header) const
 {
     const auto protocolColor = ansi::bright_red;
     const auto fieldsColor = ansi::bright_blue;
@@ -255,7 +255,7 @@ void printTCP(const TcpHeader& header)
     std::cout << "└───────────────────────────────────────────────────┘\n";
 }
 
-void printUDP(const UdpHeader& header)
+void ConsolePrinter::printUDP(const UdpHeader& header) const
 {
     const auto protocolColor = ansi::bright_yellow;
     const auto fieldsColor = ansi::bright_blue;
@@ -297,7 +297,7 @@ void printUDP(const UdpHeader& header)
     std::cout << "├───────────────────────────────────────────────────┤\n";
 }
 
-void printICMP(const IcmpHeader& header)
+void ConsolePrinter::printICMP(const IcmpHeader& header) const
 {
     const auto protocolColor = ansi::bright_cyan;
     const auto fieldsColor = ansi::bright_blue;
@@ -341,7 +341,7 @@ void printICMP(const IcmpHeader& header)
     std::cout << "└───────────────────────────────────────────────────┘\n";
 }
 
-void printDNS(const DnsHeader& header)
+void ConsolePrinter::printDNS(const DnsHeader& header) const
 {
     const auto protocolColor = ansi::bright_green;
     const auto fieldsColor = ansi::bright_blue;
