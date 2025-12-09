@@ -19,8 +19,8 @@ void printEthernetFrame(const EtherFrame &frame)
 
     std::cout << "│ ";
     std::cout << fieldsColor
-              << left << setw(17) << "DST"
-              << left << setw(19) << "SRC"
+              << left << setw(18) << "TARGET"
+              << left << setw(18) << "SOURCE"
               << left << setw(9) << "TYPE"
               << left << "DATA"
               << ansi::reset
@@ -28,8 +28,8 @@ void printEthernetFrame(const EtherFrame &frame)
 
     std::cout << "│ ";
     std::cout << valuesColor
-              << left << setw(17) << frame.destStr()
-              << left << setw(19) << frame.sourceStr()
+              << left << setw(18) << frame.destStr()
+              << left << setw(18) << frame.sourceStr()
               << left << setw(9) << frame.typeStr()
               << left << setw(4) << frame.getPayloadLen()
               << ansi::reset
@@ -38,9 +38,73 @@ void printEthernetFrame(const EtherFrame &frame)
     std::cout << "├───────────────────────────────────────────────────┤\n";
 }
 
+void printARP(const ArpHeader &header)
+{
+    const auto protocolColor = ansi::purple;
+    const auto fieldsColor = ansi::bright_blue;
+    const auto valuesColor = ansi::white;
+
+    std::cout << "│ ";
+    std::cout << protocolColor
+            << left << setw(49) << "ARP" 
+            << ansi::reset << " │\n";
+
+    std::cout << "│ ";
+    std::cout << fieldsColor
+              << left << setw(9) << "HTYPE"
+              << left << setw(9) << "PTYPE"
+              << left << setw(9) << "HLEN"
+              << left << setw(9) << "PLEN"
+              << left << setw(13) << "OPER"
+              << ansi::reset
+              << " │\n";
+
+    const std::string arpOper {std::to_string(header.operation()) + " (" + arpOperation(header.operation()) + ")"};
+    std::cout << "│ ";
+    std::cout << valuesColor
+              << left << setw(9) << header.hardwareType()
+              << std::showbase << std::hex << left << setw(9) << header.protocolType() << std::noshowbase
+              << left << setw(9) << header.hardwareLength()
+              << left << setw(9) << header.protocolLength()
+              << left << setw(13) << arpOper
+              << ansi::reset
+              << " │\n";
+
+    std::cout << "│ ";
+    std::cout << fieldsColor
+              << left << setw(18) << "SOURCE MAC"
+              << left << setw(31) << "SOURCE ADDRESS"
+              << ansi::reset
+              << " │\n";
+
+    std::cout << "│ ";
+    std::cout << valuesColor
+              << left << setw(18) << header.sourceMacStr()
+              << left << setw(31) << header.sourceIpStr()
+              << ansi::reset
+              << " │\n";
+
+    std::cout << "│ ";
+    std::cout << fieldsColor
+              << left << setw(18) << "TARGET MAC"
+              << left << setw(31) << "TARGET ADDRESS"
+              << ansi::reset
+              << " │\n";
+
+    std::cout << "│ ";
+    std::cout << valuesColor
+              << left << setw(18) << header.targetMacStr()
+              << left << setw(31) << header.targetIpStr()
+              << ansi::reset
+              << " │\n";
+        
+    std::cout << "└───────────────────────────────────────────────────┘\n";
+    
+}
+
 void printIPV4(const IpHeader& header)
 {
-    const auto protocolColor = ansi::bright_cyan;
+    const auto protocolColor = ansi::blue;
     const auto fieldsColor = ansi::bright_blue;
     const auto valuesColor = ansi::white;
 
