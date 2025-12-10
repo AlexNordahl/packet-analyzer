@@ -8,9 +8,9 @@ std::pair<IpHeader, const u_char*> parseIPV4(const u_char* data)
     uint8_t ihl = ip.ver_ihl & 0x0F;
     size_t headerLength = ihl * 4;
 
-    const u_char* data = data + headerLength;
+    const u_char* payload = data + headerLength;
 
-    return {ip, data};
+    return {ip, payload};
 }
 
 std::pair<TcpHeader, const u_char*> parseTCP(const u_char* data)

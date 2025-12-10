@@ -1,64 +1,94 @@
 #include <iostream>
+#include <optional>
 #include "pcap_facade.h"
-#include "printer.h"
+#include "printer/console_printer.h"
+#include "printer/file_printer.h"
+#include "helpers/parsers.h"
 
-int main()
+std::optional<std::string> handleCommandLineArgs(int argc, char const* argv[]);
+void parseAndPrintFrame(const EtherFrame& frame, const u_char* payload, const Printer& pr);
+
+constexpr int snaplex_max = 65535;
+constexpr int timeout_ms = 1000;
+
+int main(int argc, char const* argv[])
 {
     PcapFacade pf;
     pf.autoSelectDevice();
-
-    std::cout << "Device: " << pf.getSelectedDevice() << "\n";
-    std::cout << "IPv4: " << pf.getIPv4() << "\n";
-    std::cout << "Mask: " << pf.maskToCIDR(pf.getMask()) << "\n";
-
-    pf.configure(65535, true, 1000);
+    pf.configure(snaplex_max, true, timeout_ms);
     pf.activate();
+
+    auto arguments = handleCommandLineArgs(argc, argv);
+    if (arguments.has_value())
+    {
+        pf.setFilter(arguments.value().c_str());
+    }
 
     while (true)
     {
         const auto [frame, payload] = pf.next();
-
-        printEthernetFrame(frame);
-        if (frame.type == ETHERTYPE_IP)
-        {
-            const auto [header, ipData] = pf.parseIPV4(payload);
-            printIPV4(header);
-
-            switch (header.protocol)
-            {
-                case IPPROTO_TCP:
-                {
-                    const auto [header, tcpData] = pf.parseTCP(ipData);
-                    printTCP(header);
-                    break;
-                }
-
-                case IPPROTO_UDP:
-                {
-                    const auto [header, udpData, dataLen] = pf.parseUDP(ipData);
-                    printUDP(header);
-
-                    if (header.destPort() == 53)
-                    {
-                        const auto dns = pf.parseDNS(udpData);
-                        printDNS(dns);
-                    }
-
-                    break;
-                }
-
-                case IPPROTO_ICMP:
-                {
-                    const auto header = pf.parseICMP(ipData);
-                    printICMP(header);
-                    break;
-                }
-
-                default: break;
-            }
-        }
+        const ConsolePrinter printer {};
+        parseAndPrintFrame(frame, payload, printer);
         std::cout << "\n";
     }
+}
+
+std::optional<std::string> handleCommandLineArgs(int argc, char const *argv[])
+{
+    if (argc == 1)
+        return std::nullopt;
+
+    if (argc != 3)
+        throw std::invalid_argument("Usage: program -f \"protocol or protocol or...\"");
+
+    if (strcmp(argv[1], "-f") != 0 or strcmp(argv[1],"--filter") != 0)
+        throw std::invalid_argument("Usage: program -f \"protocol or protocol or...\"");
+
+    return {argv[2]};
+}
+
+void parseAndPrintFrame(const EtherFrame& frame, const u_char* payload, const Printer& pr)
+{
+    pr.printEthernet(frame);
     
-    return 0;
+    if (frame.type == ETHERTYPE_ARP)
+    {
+        auto arpHeader = parseARP(payload);
+        pr.printARP(arpHeader);
+    }
+    else if (frame.type == ETHERTYPE_IP)
+    {
+        const auto [header, ipData] = parseIPV4(payload);
+        pr.printIPV4(header);
+
+        switch (header.protocol)
+        {
+            case IPPROTO_TCP:
+            {
+                const auto [header, tcpData] = parseTCP(ipData);
+                pr.printTCP(header);
+                break;
+            }
+            case IPPROTO_UDP:
+            {
+                const auto [header, udpData, dataLen] = parseUDP(ipData);
+                pr.printUDP(header);
+
+                if (header.destPort() == 53)
+                {
+                    const auto dns = parseDNS(udpData);
+                    pr.printDNS(dns);
+                }
+                break;
+            }
+            case IPPROTO_ICMP:
+            {
+                const auto header = parseICMP(ipData);
+                pr.printICMP(header);
+                break;
+            }
+
+            default: break;
+        }
+    }
 }
