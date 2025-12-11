@@ -15,10 +15,34 @@ Below is an example of captured packets:
 - Message timestamps
 - Colored logs
 
+## Usage
+
+### List available network interfaces
+./main --list
+
+### Start sniffing on a specific interface
+./main -i eth0
+
+### Apply a capture filter
+./main -i wlan0 -f "tcp or udp"
+
 ## Future Improvements
 
 Ideas for the future:
 - Storing results in a file
+- Support for IPv6
+- Export captured packets to PCAP files
+- JSON/CSV output formatting
+- Live terminal dashboard (ncurses) or Web UI
+- Protocol-specific analysis plugins
+- Extended IPv6 support
+
+## Design Overview
+The `pcap_facade` module wraps raw libpcap functions into a type-safe C++17 interface.  
+It ensures RAII-based resource management, error-safe packet handling, and clean separation between:
+- packet capture layer  
+- packet parsing layer  
+- output/printing layer  
 
 ## Build Instructions
 
@@ -31,11 +55,4 @@ cmake --build build -j
 
 # Run example
 ./build/main
-```
-
-## Flags
-
-```bash
-Filter: -f <protocols> or --filter <protocols>
-Example: ./main -f "tcp or udp"
 ```
